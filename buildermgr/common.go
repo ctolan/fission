@@ -40,17 +40,17 @@ import (
 // 3. Send upload request to fetcher to upload deployment package.
 // 4. Return upload response and build logs.
 // *. Return build logs and error if any one of steps above failed.
-func buildPackage(fissionClient *crd.FissionClient, builderNamespace string,
+func buildPackage(fissionClient *crd.FissionClient,
 	storageSvcUrl string, pkg *crd.Package) (uploadResp *fetcher.UploadResponse, buildLogs string, err error) {
 
-	env, err := fissionClient.Environments(metav1.NamespaceDefault).Get(pkg.Spec.Environment.Name)
+	env, err := fissionClient.Environments(pkg.Spec.Environment.Namespace).Get(pkg.Spec.Environment.Name)
 	if err != nil {
 		e := fmt.Sprintf("Error getting environment CRD info: %v", err)
 		log.Println(e)
 		return nil, e, fission.MakeError(http.StatusInternalServerError, e)
 	}
 
-	svcName := fmt.Sprintf("%v-%v.%v", env.Metadata.Name, env.Metadata.ResourceVersion, builderNamespace)
+	svcName := fmt.Sprintf("%v-%v.%v", env.Metadata.Name, env.Metadata.ResourceVersion, env.Metadata.Namespace)
 	srcPkgFilename := fmt.Sprintf("%v-%v", pkg.Metadata.Name, strings.ToLower(uniuri.NewLen(6)))
 	fetcherC := fetcherClient.MakeClient(fmt.Sprintf("http://%v:8000", svcName))
 	builderC := builderClient.MakeClient(fmt.Sprintf("http://%v:8001", svcName))
@@ -131,7 +131,7 @@ func updatePackage(fissionClient *crd.FissionClient,
 	}
 
 	// update package spec
-	pkg, err := fissionClient.Packages(metav1.NamespaceDefault).Update(pkg)
+	pkg, err := fissionClient.Packages(pkg.Metadata.Namespace).Update(pkg)
 	if err != nil {
 		log.Printf("Error updating package: %v", err)
 		return nil, err

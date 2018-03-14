@@ -42,6 +42,7 @@ const (
 	CLEANUP_BUILDERS
 
 	LABEL_ENV_NAME            = "envName"
+	LABEL_ENV_NAMESPACE            = "envNamespace"
 	LABEL_ENV_RESOURCEVERSION = "envResourceVersion"
 )
 
@@ -129,9 +130,10 @@ func (envw *environmentWatcher) getCacheKey(envName string, envResourceVersion s
 	return fmt.Sprintf("%v-%v", envName, envResourceVersion)
 }
 
-func (envw *environmentWatcher) getLabels(envName string, envResourceVersion string) map[string]string {
+func (envw *environmentWatcher) getLabels(envName string, envNamespace string, envResourceVersion string) map[string]string {
 	return map[string]string{
 		LABEL_ENV_NAME:            envName,
+		LABEL_ENV_NAMESPACE: envNamespace,
 		LABEL_ENV_RESOURCEVERSION: envResourceVersion,
 	}
 }
@@ -451,7 +453,7 @@ func (envw *environmentWatcher) createBuilderDeployment(env *crd.Environment) (*
 	sharedCfgMapPath := "/configs"
 	sharedSecretPath := "/secrets"
 	name := envw.getCacheKey(env.Metadata.Name, env.Metadata.ResourceVersion)
-	sel := envw.getLabels(env.Metadata.Name, env.Metadata.ResourceVersion)
+	sel := envw.getLabels(env.Metadata.Name, env.Metadata.Namespace ,env.Metadata.ResourceVersion)
 	var replicas int32 = 1
 
 	podAnnotation := make(map[string]string)
@@ -461,7 +463,7 @@ func (envw *environmentWatcher) createBuilderDeployment(env *crd.Environment) (*
 
 	deployment := &v1beta1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: envw.builderNamespace,
+			Namespace: env.Metadata.Namespace,
 			Name:      name,
 			Labels:    sel,
 		},
