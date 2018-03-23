@@ -287,9 +287,9 @@ func (deploy *NewDeploy) fnCreate(fn *crd.Function) (*fscache.FuncSvc, error) {
 	deployLabels := deploy.getDeployLabels(fn, env)
 
 	// to support backward compatibility, if the function was created in default ns, we fall back to creating the
-	// deployment of the function to fission-function
+	// deployment of the function in fission-function ns
 	ns := deploy.namespace
-	if fn.Metadata.Namespace == metav1.NamespaceDefault {
+	if fn.Metadata.Namespace != metav1.NamespaceDefault {
 		ns = fn.Metadata.Namespace
 	}
 
@@ -501,19 +501,26 @@ func (deploy *NewDeploy) fnDelete(fn *crd.Function) (*fscache.FuncSvc, error) {
 	}
 	objName := fsvc.Name
 
-	err = deploy.deleteDeployment(fn.Metadata.Namespace, objName)
+	// to support backward compatibility, if the function was created in default ns, we fall back to creating the
+	// deployment of the function in fission-function ns
+	ns := deploy.namespace
+	if fn.Metadata.Namespace != metav1.NamespaceDefault {
+		ns = fn.Metadata.Namespace
+	}
+
+	err = deploy.deleteDeployment(ns, objName)
 	if err != nil {
 		log.Printf("Error deleting the deployment: %v", objName)
 		delError = err
 	}
 
-	err = deploy.deleteSvc(fn.Metadata.Namespace, objName)
+	err = deploy.deleteSvc(ns, objName)
 	if err != nil {
 		log.Printf("Error deleting the service: %v", objName)
 		delError = err
 	}
 
-	err = deploy.deleteHpa(fn.Metadata.Namespace, objName)
+	err = deploy.deleteHpa(ns, objName)
 	if err != nil {
 		log.Printf("Error deleting the HPA: %v", objName)
 		delError = err

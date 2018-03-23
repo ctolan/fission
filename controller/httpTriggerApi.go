@@ -30,7 +30,13 @@ import (
 )
 
 func (a *API) HTTPTriggerApiList(w http.ResponseWriter, r *http.Request) {
-	triggers, err := a.fissionClient.HTTPTriggers(metav1.NamespaceAll).List(metav1.ListOptions{})
+	vars := mux.Vars(r)
+	ns := vars["namespace"]
+	if len(ns) == 0 {
+		ns = metav1.NamespaceAll
+	}
+
+	triggers, err := a.fissionClient.HTTPTriggers(ns).List(metav1.ListOptions{})
 	if err != nil {
 		a.respondWithError(w, err)
 		return

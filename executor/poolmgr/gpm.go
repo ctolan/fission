@@ -126,7 +126,6 @@ func (gpm *GenericPoolManager) service() {
 					delete(gpm.pools, key)
 
 					// and delete the pool asynchronously.
-					// TODO : Come back, may be move it to env delete call? Potential bug.
 					go pool.destroy()
 				}
 			}

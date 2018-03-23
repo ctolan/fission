@@ -452,7 +452,7 @@ func (envw *environmentWatcher) createBuilderService(env *crd.Environment, ns st
 	sel := envw.getLabels(env.Metadata.Name, ns, env.Metadata.ResourceVersion)
 	service := apiv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: envw.builderNamespace,
+			Namespace: ns,
 			Name:      name,
 			Labels:    sel,
 		},
