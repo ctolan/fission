@@ -109,6 +109,7 @@ func (c *Client) MessageQueueTriggerDelete(m *metav1.ObjectMeta) error {
 	return c.delete(relativeUrl)
 }
 
+// TODO : Come back later to fix this.
 func (c *Client) MessageQueueTriggerList(mqType string) ([]crd.MessageQueueTrigger, error) {
 	relativeUrl := "triggers/messagequeue"
 	if len(mqType) > 0 {

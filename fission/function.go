@@ -117,9 +117,9 @@ func getTargetCPU(c *cli.Context) int {
 func fnCreate(c *cli.Context) error {
 	client := getClient(c.GlobalString("server"))
 
+	fnNamespace := c.String("fnNamespace")
 	envNamespace := c.String("envNamespace")
 	pkgNamespace := c.String("pkgNamespace")
-	fnNamespace := c.String("fnNamespace")
 
 	if len(c.String("package")) > 0 {
 		fatal("--package is deprecated, please use --deploy instead.")
@@ -138,7 +138,7 @@ func fnCreate(c *cli.Context) error {
 		specFile = fmt.Sprintf("function-%v.yaml", fnName)
 	}
 
-	// TODO : Check if we need this at all.
+	// check for unique function names within a namespace
 	fnList, err := client.FunctionList(fnNamespace)
 	checkErr(err, "get function list")
 	// check function existence before creating package
@@ -448,7 +448,7 @@ func fnUpdate(c *cli.Context) error {
 		Namespace: pkgNamespace,
 		Name:      pkgName,
 	})
-	checkErr(err, fmt.Sprintf("read package '%v'", pkgName))
+	checkErr(err, fmt.Sprintf("read package '%v.%v'", pkgName, pkgNamespace))
 
 	pkgMetadata := &pkg.Metadata
 
@@ -561,7 +561,7 @@ func fnList(c *cli.Context) error {
 	client := getClient(c.GlobalString("server"))
 	ns := c.String("fnNamespace")
 
-	fns, err := client.FunctionList()
+	fns, err := client.FunctionList(ns)
 	checkErr(err, "list functions")
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
@@ -661,7 +661,7 @@ func fnLogs(c *cli.Context) error {
 		time.Sleep(1 * time.Second)
 	}
 }
-
+// TODO : Come back to fix ns.
 func fnPods(c *cli.Context) error {
 	client := getClient(c.GlobalString("server"))
 

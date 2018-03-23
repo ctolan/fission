@@ -95,9 +95,16 @@ func (gpm *GenericPoolManager) service() {
 					poolsize = 1
 				}
 
+				// To support backward compatibility, if envs are created in default ns, we go ahead
+				// and create pools in fission-function ns as earlier.
+				ns := gpm.namespace
+				if req.env.Metadata.Namespace != metav1.NamespaceDefault {
+					ns = req.env.Metadata.Namespace
+				}
+
 				pool, err = MakeGenericPool(
 					gpm.fissionClient, gpm.kubernetesClient, req.env, poolsize,
-					req.env.Metadata.Namespace, gpm.fsCache, gpm.instanceId)
+					ns, gpm.fsCache, gpm.instanceId)
 				if err != nil {
 					req.responseChannel <- &response{error: err}
 					continue

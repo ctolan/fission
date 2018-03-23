@@ -144,7 +144,6 @@ func (deploy *NewDeploy) Run(ctx context.Context) {
 
 func (deploy *NewDeploy) initFuncController() (k8sCache.Store, k8sCache.Controller) {
 	resyncPeriod := 30 * time.Second
-	// TODO : Come back and see if the ndb functions have a special lable or annotation.
 	listWatch := k8sCache.NewListWatchFromClient(deploy.crdClient, "functions", metav1.NamespaceAll, fields.Everything())
 	store, controller := k8sCache.NewInformer(listWatch, &crd.Function{}, resyncPeriod, k8sCache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
@@ -287,19 +286,26 @@ func (deploy *NewDeploy) fnCreate(fn *crd.Function) (*fscache.FuncSvc, error) {
 
 	deployLabels := deploy.getDeployLabels(fn, env)
 
+	// to support backward compatibility, if the function was created in default ns, we fall back to creating the
+	// deployment of the function to fission-function
+	ns := deploy.namespace
+	if fn.Metadata.Namespace == metav1.NamespaceDefault {
+		ns = fn.Metadata.Namespace
+	}
+
 	// Envoy(istio-proxy) returns 404 directly before istio pilot
 	// propagates latest Envoy-specific configuration.
 	// Since newdeploy waits for pods of deployment to be ready,
 	// change the order of kubeObject creation (create service first,
 	// then deployment) to take advantage of waiting time.
-	svc, err := deploy.createOrGetSvc(deployLabels, objName, fn.Metadata.Namespace)
+	svc, err := deploy.createOrGetSvc(deployLabels, objName, ns)
 	if err != nil {
 		log.Printf("Error creating the service %v: %v", objName, err)
 		return fsvc, err
 	}
 	svcAddress := fmt.Sprintf("%v.%v", svc.Name, svc.Namespace)
 
-	depl, err := deploy.createOrGetDeployment(fn, env, objName, deployLabels, fn.Metadata.Namespace)
+	depl, err := deploy.createOrGetDeployment(fn, env, objName, deployLabels, ns)
 	if err != nil {
 		log.Printf("Error creating the deployment %v: %v", objName, err)
 		return fsvc, err

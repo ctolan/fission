@@ -35,7 +35,7 @@ func (a *API) EnvironmentApiList(w http.ResponseWriter, r *http.Request) {
 	if len(ns) == 0 {
 		ns = metav1.NamespaceAll
 	}
-	envs, err := a.fissionClient.Environments(metav1.NamespaceAll).List(metav1.ListOptions{})
+	envs, err := a.fissionClient.Environments(ns).List(metav1.ListOptions{})
 	if err != nil {
 		a.respondWithError(w, err)
 		return

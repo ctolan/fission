@@ -289,7 +289,7 @@ func (a *API) FunctionPodLogs(w http.ResponseWriter, r *http.Request) {
 		ns = "fission-function"
 	}
 
-	f, err := a.fissionClient.Functions(api.NamespaceDefault).Get(fnName)
+	f, err := a.fissionClient.Functions(ns).Get(fnName)
 	if err != nil {
 		a.respondWithError(w, err)
 		return

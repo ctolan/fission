@@ -29,7 +29,12 @@ import (
 )
 
 func (a *API) PackageApiList(w http.ResponseWriter, r *http.Request) {
-	funcs, err := a.fissionClient.Packages(metav1.NamespaceAll).List(metav1.ListOptions{})
+	vars := mux.Vars(r)
+	ns := vars["namespace"]
+	if len(ns) == 0 {
+		ns = metav1.NamespaceAll
+	}
+	funcs, err := a.fissionClient.Packages(ns).List(metav1.ListOptions{})
 	if err != nil {
 		a.respondWithError(w, err)
 		return

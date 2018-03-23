@@ -76,10 +76,11 @@ func ttUpdate(c *cli.Context) error {
 	if len(ttName) == 0 {
 		fatal("Need name of trigger, use --name")
 	}
+	triggerNamespace := c.String("triggerNamespace")
 
 	tt, err := client.TimeTriggerGet(&metav1.ObjectMeta{
 		Name:      ttName,
-		Namespace: metav1.NamespaceDefault,
+		Namespace: triggerNamespace,
 	})
 	checkErr(err, "get time trigger")
 
@@ -112,10 +113,11 @@ func ttDelete(c *cli.Context) error {
 	if len(ttName) == 0 {
 		fatal("Need name of trigger to delete, use --name")
 	}
+	triggerNamespace := c.String("triggerNamespace")
 
 	err := client.TimeTriggerDelete(&metav1.ObjectMeta{
 		Name:      ttName,
-		Namespace: metav1.NamespaceDefault,
+		Namespace: triggerNamespace,
 	})
 	checkErr(err, "delete trigger")
 
@@ -125,8 +127,9 @@ func ttDelete(c *cli.Context) error {
 
 func ttList(c *cli.Context) error {
 	client := getClient(c.GlobalString("server"))
+	triggerNamespace := c.String("triggerNamespace")
 
-	tts, err := client.TimeTriggerList()
+	tts, err := client.TimeTriggerList(triggerNamespace)
 	checkErr(err, "list Time triggers")
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
