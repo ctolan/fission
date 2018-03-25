@@ -119,6 +119,15 @@ func (api *API) respondWithError(w http.ResponseWriter, err error) {
 	http.Error(w, msg, code)
 }
 
+func (api *API) extractQueryParamFromRequest(r *http.Request, queryParam string) string {
+	values := r.URL.Query()
+	paramValue, ok := values[queryParam]
+	if !ok || len(paramValue) == 0 {
+		return ""
+	}
+	return paramValue[0]
+}
+
 func (api *API) getLogDBConfig(dbType string) logDBConfig {
 	dbType = strings.ToUpper(dbType)
 	// retrieve db auth config from the env

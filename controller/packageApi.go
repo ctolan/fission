@@ -29,8 +29,7 @@ import (
 )
 
 func (a *API) PackageApiList(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceAll
 	}
@@ -100,7 +99,7 @@ func (a *API) PackageApiCreate(w http.ResponseWriter, r *http.Request) {
 func (a *API) PackageApiGet(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["package"]
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceDefault
 	}
@@ -165,7 +164,7 @@ func (a *API) PackageApiUpdate(w http.ResponseWriter, r *http.Request) {
 func (a *API) PackageApiDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["package"]
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceDefault
 	}

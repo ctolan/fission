@@ -30,8 +30,7 @@ import (
 )
 
 func (a *API) HTTPTriggerApiList(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceAll
 	}
@@ -112,7 +111,7 @@ func (a *API) HTTPTriggerApiCreate(w http.ResponseWriter, r *http.Request) {
 func (a *API) HTTPTriggerApiGet(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["httpTrigger"]
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceDefault
 	}
@@ -178,7 +177,7 @@ func (a *API) HTTPTriggerApiUpdate(w http.ResponseWriter, r *http.Request) {
 func (a *API) HTTPTriggerApiDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["httpTrigger"]
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceDefault
 	}

@@ -45,8 +45,7 @@ func (a *API) getIstioServiceLabels(fnName string) map[string]string {
 }
 
 func (a *API) FunctionApiList(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceAll
 	}
@@ -161,7 +160,7 @@ func (a *API) FunctionApiCreate(w http.ResponseWriter, r *http.Request) {
 func (a *API) FunctionApiGet(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["function"]
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceDefault
 	}
@@ -220,7 +219,7 @@ func (a *API) FunctionApiUpdate(w http.ResponseWriter, r *http.Request) {
 func (a *API) FunctionApiDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["function"]
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceDefault
 	}

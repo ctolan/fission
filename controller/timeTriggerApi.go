@@ -30,8 +30,7 @@ import (
 )
 
 func (a *API) TimeTriggerApiList(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceAll
 	}
@@ -98,7 +97,7 @@ func (a *API) TimeTriggerApiCreate(w http.ResponseWriter, r *http.Request) {
 func (a *API) TimeTriggerApiGet(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["timeTrigger"]
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceDefault
 	}
@@ -165,7 +164,7 @@ func (a *API) TimeTriggerApiUpdate(w http.ResponseWriter, r *http.Request) {
 func (a *API) TimeTriggerApiDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["timeTrigger"]
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceDefault
 	}

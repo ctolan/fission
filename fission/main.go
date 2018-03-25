@@ -66,7 +66,7 @@ func main() {
 	}
 
 	// namespace reference for all objects
-	fnNamespaceFlag := cli.StringFlag{Name: "functionNamespace, fns", Value: metav1.NamespaceDefault, Usage: "namespace for function object"}
+	fnNamespaceFlag := cli.StringFlag{Name: "fnNamespace, fns", Value: metav1.NamespaceDefault, Usage: "namespace for function object"}
 	envNamespaceFlag := cli.StringFlag{Name: "envNamespace, envns", Value: metav1.NamespaceDefault, Usage: "namespace for environment object"}
 	pkgNamespaceFlag := cli.StringFlag{Name: "pkgNamespace, pkgns", Value: metav1.NamespaceDefault, Usage: "namespace for package object"}
 	triggerNamespaceFlag := cli.StringFlag{Name: "triggerNamespace, triggerns", Value: metav1.NamespaceDefault, Usage: "namespace for trigger object"}

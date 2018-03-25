@@ -85,7 +85,7 @@ func (a *API) WatchApiCreate(w http.ResponseWriter, r *http.Request) {
 func (a *API) WatchApiGet(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["watch"]
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceDefault
 	}
@@ -113,7 +113,7 @@ func (a *API) WatchApiUpdate(w http.ResponseWriter, r *http.Request) {
 func (a *API) WatchApiDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["watch"]
-	ns := vars["namespace"]
+	ns := a.extractQueryParamFromRequest(r, "namespace")
 	if len(ns) == 0 {
 		ns = metav1.NamespaceDefault
 	}
