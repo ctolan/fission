@@ -67,6 +67,13 @@ func (a *API) MessageQueueTriggerApiCreate(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	// check if namespace exists, if not create it.
+	err = a.createNsIfNotExists(mqTrigger.Metadata.Namespace)
+	if err != nil {
+		a.respondWithError(w, err)
+		return
+	}
+
 	tnew, err := a.fissionClient.MessageQueueTriggers(mqTrigger.Metadata.Namespace).Create(&mqTrigger)
 	if err != nil {
 		a.respondWithError(w, err)

@@ -557,6 +557,7 @@ func fnDelete(c *cli.Context) error {
 	return err
 }
 
+// TODO : STV. if user input nothing, default shd be "all" ns only for this operation
 func fnList(c *cli.Context) error {
 	client := getClient(c.GlobalString("server"))
 	ns := c.String("fnNamespace")

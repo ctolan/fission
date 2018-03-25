@@ -85,6 +85,13 @@ func (a *API) FunctionApiCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// check if namespace exists, if not create it.
+	err = a.createNsIfNotExists(f.Metadata.Namespace)
+	if err != nil {
+		a.respondWithError(w, err)
+		return
+	}
+
 	fnew, err := a.fissionClient.Functions(f.Metadata.Namespace).Create(&f)
 	if err != nil {
 		a.respondWithError(w, err)

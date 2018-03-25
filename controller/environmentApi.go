@@ -71,6 +71,13 @@ func (a *API) EnvironmentApiCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// check if namespace exists, if not create it.
+	err = a.createNsIfNotExists(env.Metadata.Namespace)
+	if err != nil {
+		a.respondWithError(w, err)
+		return
+	}
+
 	enew, err := a.fissionClient.Environments(env.Metadata.Namespace).Create(&env)
 	if err != nil {
 		a.respondWithError(w, err)

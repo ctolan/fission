@@ -64,6 +64,13 @@ func (a *API) WatchApiCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// check if namespace exists, if not create it.
+	err = a.createNsIfNotExists(watch.Metadata.Namespace)
+	if err != nil {
+		a.respondWithError(w, err)
+		return
+	}
+
 	// TODO check for duplicate watches
 
 	wnew, err := a.fissionClient.KubernetesWatchTriggers(watch.Metadata.Namespace).Create(&watch)

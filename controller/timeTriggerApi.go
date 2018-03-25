@@ -78,6 +78,13 @@ func (a *API) TimeTriggerApiCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// check if namespace exists, if not create it.
+	err = a.createNsIfNotExists(t.Metadata.Namespace)
+	if err != nil {
+		a.respondWithError(w, err)
+		return
+	}
+
 	tnew, err := a.fissionClient.TimeTriggers(t.Metadata.Namespace).Create(&t)
 	if err != nil {
 		a.respondWithError(w, err)

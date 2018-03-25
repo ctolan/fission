@@ -28,6 +28,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/kubernetes"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/fission/fission"
 	"github.com/fission/fission/crd"
@@ -126,6 +128,26 @@ func (api *API) extractQueryParamFromRequest(r *http.Request, queryParam string)
 		return ""
 	}
 	return paramValue[0]
+}
+
+// check if namespace exists, if not create it.
+func (api *API) createNsIfNotExists(ns string) error {
+	if ns == metav1.NamespaceDefault {
+		// we dont have to create default ns
+		return nil
+	}
+
+	_, err := api.kubernetesClient.CoreV1Client.Namespaces().Get(ns, metav1.GetOptions{})
+	if err != nil && kerrors.IsNotFound(err) {
+		ns := &apiv1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: ns,
+			},
+		}
+		_, err = api.kubernetesClient.CoreV1Client.Namespaces().Create(ns)
+	}
+
+	return err
 }
 
 func (api *API) getLogDBConfig(dbType string) logDBConfig {
