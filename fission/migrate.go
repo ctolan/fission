@@ -23,6 +23,7 @@ import (
 	"net/http"
 
 	"github.com/urfave/cli"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/fission/fission"
 	"github.com/fission/fission/controller/client"
@@ -43,17 +44,18 @@ type (
 )
 
 func migrateDumpTPRResource(client *client.Client, filename string) {
-	pkgs, err := client.PackageList()
+	// TODO : STV
+	pkgs, err := client.PackageList(metav1.NamespaceAll)
 	checkErr(err, "dump packages")
-	fns, err := client.FunctionList()
+	fns, err := client.FunctionList(metav1.NamespaceAll)
 	checkErr(err, "dump functions")
-	httpTriggers, err := client.HTTPTriggerList()
+	httpTriggers, err := client.HTTPTriggerList(metav1.NamespaceAll)
 	checkErr(err, "dump http triggers")
-	envs, err := client.EnvironmentList()
+	envs, err := client.EnvironmentList(metav1.NamespaceAll)
 	checkErr(err, "dump environments")
 	watches, err := client.WatchList()
 	checkErr(err, "dump watches")
-	timeTriggers, err := client.TimeTriggerList()
+	timeTriggers, err := client.TimeTriggerList(metav1.NamespaceAll)
 	checkErr(err, "dump time triggers")
 	mqTriggers, err := client.MessageQueueTriggerList(messageQueue.NATS)
 	checkErr(err, "dump message queue triggers")

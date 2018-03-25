@@ -66,6 +66,10 @@ func (deploy *NewDeploy) createOrGetDeployment(fn *crd.Function, env *crd.Enviro
 	}
 
 	if err != nil && k8s_err.IsNotFound(err) {
+		err = fission.SetupRBAC(deploy.kubernetesClient, "fission-fetcher", deployNamespace, "fission-fetcher-crd", "cluster-admin")
+		if err != nil {
+			return nil, err
+		}
 
 		deployment, err := deploy.getDeploymentSpec(fn, env, deployName, deployLabels)
 		if err != nil {
@@ -116,7 +120,8 @@ func (deploy *NewDeploy) getDeploymentSpec(fn *crd.Function, env *crd.Environmen
 		replicas = 1
 	}
 	targetFilename := "user"
-	var gracePeriodSeconds int64 = 6 * 60
+	//var gracePeriodSeconds int64 = 6 * 60
+	var gracePeriodSeconds int64 = 0
 
 	fetchReq := &fetcher.FetchRequest{
 		FetchType: fetcher.FETCH_DEPLOYMENT,

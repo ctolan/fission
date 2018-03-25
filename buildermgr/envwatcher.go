@@ -343,6 +343,12 @@ func (envw *environmentWatcher) createBuilder(env *crd.Environment, ns string) (
 	}
 	// there should be only one deploy in deployList
 	if len(deployList) == 0 {
+		// TODO : Convert to constants.
+		err = fission.SetupRBAC(envw.kubernetesClient,"fission-builder", ns, "fission-builder-crd", "cluster-admin")
+		if err != nil {
+			return nil, fmt.Errorf("Error setting up RBAC: %v", err)
+		}
+
 		deploy, err = envw.createBuilderDeployment(env, ns)
 		if err != nil {
 			return nil, fmt.Errorf("Error creating builder deployment: %v", err)
@@ -633,5 +639,7 @@ func (envw *environmentWatcher) createBuilderDeployment(env *crd.Environment, ns
 	if err != nil {
 		return nil, err
 	}
+
 	return deployment, nil
 }
+

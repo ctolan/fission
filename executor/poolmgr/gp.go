@@ -57,6 +57,7 @@ type (
 		replicas               int32                         // num idle pods
 		deployment             *v1beta1.Deployment           // kubernetes deployment
 		namespace              string                        // namespace to keep our resources
+		functionNamespace      string                        // fallback namespace for fission functions
 		podReadyTimeout        time.Duration                 // timeout for generic pods to become ready
 		idlePodReapTime        time.Duration                 // pods unused for idlePodReapTime are deleted
 		fsCache                *fscache.FunctionServiceCache // cache funcSvc's by function, address and podname
@@ -104,6 +105,7 @@ func MakeGenericPool(
 	env *crd.Environment,
 	initialReplicas int32,
 	namespace string,
+	functionNamespace string,
 	fsCache *fscache.FunctionServiceCache,
 	instanceId string) (*GenericPool, error) {
 
@@ -141,6 +143,7 @@ func MakeGenericPool(
 		fissionClient:    fissionClient,
 		kubernetesClient: kubernetesClient,
 		namespace:        namespace,
+		functionNamespace: functionNamespace,
 		podReadyTimeout:  5 * time.Minute, // TODO make this an env param?
 		idlePodReapTime:  3 * time.Minute, // TODO make this configurable
 		fsCache:          fsCache,
@@ -159,6 +162,12 @@ func MakeGenericPool(
 	gp.fetcherImagePullPolicy = getImagePullPolicy(fetcherImagePullPolicy)
 	log.Printf("fetcher image: %v, pull policy: %v", gp.fetcherImage, gp.fetcherImagePullPolicy)
 
+	// setup RBAC
+	err := fission.SetupRBAC(gp.kubernetesClient, "fission-fetcher", gp.namespace, "fission-fetcher-crd", "cluster-admin")
+	if err != nil {
+		return nil, err
+	}
+
 	// Labels for generic deployment/RS/pods.
 	gp.labelsForPool = map[string]string{
 		"environmentName":                 gp.env.Metadata.Name,
@@ -168,7 +177,7 @@ func MakeGenericPool(
 	}
 
 	// create the pool
-	err := gp.createPool()
+	err = gp.createPool()
 	if err != nil {
 		return nil, err
 	}
@@ -479,7 +488,9 @@ func (gp *GenericPool) createPool() error {
 
 	// Use long terminationGracePeriodSeconds for connection draining in case that
 	// pod still runs user functions.
-	var gracePeriodSeconds int64 = 6 * 60
+	//var gracePeriodSeconds int64 = 6 * 60
+	var gracePeriodSeconds int64 = 0
+
 
 	podAnnotation := make(map[string]string)
 
