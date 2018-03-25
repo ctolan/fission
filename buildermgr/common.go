@@ -38,7 +38,7 @@ import (
 // 3. Send upload request to fetcher to upload deployment package.
 // 4. Return upload response and build logs.
 // *. Return build logs and error if any one of steps above failed.
-func buildPackage(fissionClient *crd.FissionClient,
+func buildPackage(fissionClient *crd.FissionClient, envNamespace string,
 	storageSvcUrl string, pkg *crd.Package) (uploadResp *fetcher.UploadResponse, buildLogs string, err error) {
 
 	env, err := fissionClient.Environments(pkg.Spec.Environment.Namespace).Get(pkg.Spec.Environment.Name)
@@ -48,7 +48,8 @@ func buildPackage(fissionClient *crd.FissionClient,
 		return nil, e, fission.MakeError(http.StatusInternalServerError, e)
 	}
 
-	svcName := fmt.Sprintf("%v-%v.%v", env.Metadata.Name, env.Metadata.ResourceVersion, env.Metadata.Namespace)
+
+	svcName := fmt.Sprintf("%v-%v.%v", env.Metadata.Name, env.Metadata.ResourceVersion, envNamespace)
 	srcPkgFilename := fmt.Sprintf("%v-%v", pkg.Metadata.Name, strings.ToLower(uniuri.NewLen(6)))
 	fetcherC := fetcherClient.MakeClient(fmt.Sprintf("http://%v:8000", svcName))
 	builderC := builderClient.MakeClient(fmt.Sprintf("http://%v:8001", svcName))

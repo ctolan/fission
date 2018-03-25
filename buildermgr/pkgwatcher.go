@@ -118,9 +118,16 @@ func (pkgw *packageWatcher) build(buildCache *cache.Cache, pkg *crd.Package) {
 		for _, item := range items {
 			pod := item.(*apiv1.Pod)
 
+			// In order to support backward compatibility, for all builder images created in default env,
+			// the pods will be created in fission-builder namespace
+			ns := pkgw.builderNamespace
+			if env.Metadata.Namespace != metav1.NamespaceDefault {
+				ns = env.Metadata.Namespace
+			}
+
 			// Filter non-matching pods
 			if pod.ObjectMeta.Labels[LABEL_ENV_NAME] != env.Metadata.Name ||
-				pod.ObjectMeta.Labels[LABEL_ENV_NAMESPACE] != env.Metadata.Namespace ||
+				pod.ObjectMeta.Labels[LABEL_ENV_NAMESPACE] != ns ||
 				pod.ObjectMeta.Labels[LABEL_ENV_RESOURCEVERSION] != env.Metadata.ResourceVersion {
 				continue
 			}
@@ -139,8 +146,7 @@ func (pkgw *packageWatcher) build(buildCache *cache.Cache, pkg *crd.Package) {
 				break
 			}
 
-			// TODO : Change this
-			uploadResp, buildLogs, err := buildPackage(pkgw.fissionClient, pkgw.storageSvcUrl, pkg)
+			uploadResp, buildLogs, err := buildPackage(pkgw.fissionClient, ns, pkgw.storageSvcUrl, pkg)
 			if err != nil {
 				log.Printf("Error building package %v: %v", pkg.Metadata.Name, err)
 				updatePackage(pkgw.fissionClient, pkg, fission.BuildStatusFailed, buildLogs, nil)

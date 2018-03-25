@@ -42,10 +42,10 @@ const (
 	CLEANUP_BUILDERS
 
 	LABEL_ENV_NAME            = "envName"
-	LABEL_ENV_NAMESPACE            = "envNamespace"
+	LABEL_ENV_NAMESPACE       = "envNamespace"
 	LABEL_ENV_RESOURCEVERSION = "envResourceVersion"
-	LABEL_CREATED_BY = "createdBy"
-	BUILDERMGR = "buildermgr"
+	LABEL_CREATED_BY          = "createdBy"
+	BUILDERMGR                = "buildermgr"
 )
 
 type (
@@ -273,7 +273,7 @@ func (envw *environmentWatcher) service() {
 						log.Printf("Error removing builder service: %v", err)
 					}
 				}
-				delete(envw.cache, svc.ObjectMeta.Name)
+				delete(envw.cache, key)
 			}
 
 			deployList, err := envw.getBuilderDeploymentList(envw.getLabelForCreatedByBuilderMgr(), metav1.NamespaceAll)
@@ -291,7 +291,7 @@ func (envw *environmentWatcher) service() {
 						log.Printf("Error removing builder deployment: %v", err)
 					}
 				}
-				delete(envw.cache, deploy.ObjectMeta.Name)
+				delete(envw.cache, key)
 			}
 		}
 	}
@@ -454,7 +454,7 @@ func (envw *environmentWatcher) getBuilderServiceList(sel map[string]string, ns 
 }
 
 func (envw *environmentWatcher) createBuilderService(env *crd.Environment, ns string) (*apiv1.Service, error) {
-	name := envw.getCacheKey(env.Metadata.Name, ns, env.Metadata.ResourceVersion)
+	name := fmt.Sprintf("%v-%v", env.Metadata.Name, env.Metadata.ResourceVersion)
 	sel := envw.getLabels(env.Metadata.Name, ns, env.Metadata.ResourceVersion)
 	service := apiv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -510,7 +510,7 @@ func (envw *environmentWatcher) createBuilderDeployment(env *crd.Environment, ns
 	sharedMountPath := "/packages"
 	sharedCfgMapPath := "/configs"
 	sharedSecretPath := "/secrets"
-	name := envw.getCacheKey(env.Metadata.Name, ns, env.Metadata.ResourceVersion)
+	name := fmt.Sprintf("%v-%v",env.Metadata.Name, env.Metadata.ResourceVersion)
 	sel := envw.getLabels(env.Metadata.Name, ns, env.Metadata.ResourceVersion)
 	var replicas int32 = 1
 
@@ -634,7 +634,7 @@ func (envw *environmentWatcher) createBuilderDeployment(env *crd.Environment, ns
 			},
 		},
 	}
-	log.Printf("Creating builder deployment: %v", envw.getCacheKey(env.Metadata.Name, ns, env.Metadata.ResourceVersion))
+	log.Printf("Creating builder deployment: %v", fmt.Sprintf("%v-%v",env.Metadata.Name, env.Metadata.ResourceVersion))
 	_, err := envw.kubernetesClient.ExtensionsV1beta1().Deployments(ns).Create(deployment)
 	if err != nil {
 		return nil, err
