@@ -109,9 +109,8 @@ func (c *Client) TimeTriggerDelete(m *metav1.ObjectMeta) error {
 	return c.delete(relativeUrl)
 }
 
-func (c *Client) TimeTriggerList(triggerNamespace string) ([]crd.TimeTrigger, error) {
-	relativeUrl := fmt.Sprintf("triggers/time?namespace=%v", triggerNamespace)
-	resp, err := http.Get(c.url(relativeUrl))
+func (c *Client) TimeTriggerList() ([]crd.TimeTrigger, error) {
+	resp, err := http.Get(c.url("triggers/time"))
 	if err != nil {
 		return nil, err
 	}

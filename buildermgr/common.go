@@ -48,7 +48,6 @@ func buildPackage(fissionClient *crd.FissionClient, envNamespace string,
 		return nil, e, fission.MakeError(http.StatusInternalServerError, e)
 	}
 
-
 	svcName := fmt.Sprintf("%v-%v.%v", env.Metadata.Name, env.Metadata.ResourceVersion, envNamespace)
 	srcPkgFilename := fmt.Sprintf("%v-%v", pkg.Metadata.Name, strings.ToLower(uniuri.NewLen(6)))
 	fetcherC := fetcherClient.MakeClient(fmt.Sprintf("http://%v:8000", svcName))

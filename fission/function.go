@@ -663,6 +663,7 @@ func fnLogs(c *cli.Context) error {
 		time.Sleep(1 * time.Second)
 	}
 }
+
 // TODO : Come back to fix ns.
 func fnPods(c *cli.Context) error {
 	client := getClient(c.GlobalString("server"))

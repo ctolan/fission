@@ -66,7 +66,8 @@ func (deploy *NewDeploy) createOrGetDeployment(fn *crd.Function, env *crd.Enviro
 	}
 
 	if err != nil && k8s_err.IsNotFound(err) {
-		err = fission.SetupRBAC(deploy.kubernetesClient, "fission-fetcher", deployNamespace, "fission-fetcher-crd", "cluster-admin")
+		err = fission.SetupRBAC(deploy.kubernetesClient, fission.FissionFetcherSA, deployNamespace,
+			fission.FissionFetcherClusterRoleBinding, fission.ClusterAdminRole)
 		if err != nil {
 			return nil, err
 		}

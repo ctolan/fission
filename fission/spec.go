@@ -122,8 +122,6 @@ func getSpecDir(c *cli.Context) string {
 	return specDir
 }
 
-// TODO: STV ( verify all occurrences of List in this file in the end )
-
 // writeDeploymentConfig serializes the DeploymentConfig to YAML and writes it to a new
 // fission-config.yaml in specDir.
 func writeDeploymentConfig(specDir string, dc *DeploymentConfig) error {
@@ -1217,7 +1215,7 @@ func applyKubernetesWatchTriggers(fclient *client.Client, fr *FissionResources, 
 
 func applyTimeTriggers(fclient *client.Client, fr *FissionResources, delete bool) (map[string]metav1.ObjectMeta, *resourceApplyStatus, error) {
 	// get list
-	allObjs, err := fclient.TimeTriggerList(metav1.NamespaceAll)
+	allObjs, err := fclient.TimeTriggerList()
 	if err != nil {
 		return nil, nil, err
 	}

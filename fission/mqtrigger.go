@@ -41,7 +41,6 @@ func mqtCreate(c *cli.Context) error {
 	if len(fnName) == 0 {
 		fatal("Need a function name to create a trigger, use --function")
 	}
-	fnNamespace := c.String("fnNamespace")
 
 	mqType := c.String("mqtype")
 	switch mqType {
@@ -78,7 +77,7 @@ func mqtCreate(c *cli.Context) error {
 	mqt := crd.MessageQueueTrigger{
 		Metadata: metav1.ObjectMeta{
 			Name:      mqtName,
-			Namespace: fnNamespace,
+			Namespace: metav1.NamespaceDefault,
 		},
 		Spec: fission.MessageQueueTriggerSpec{
 			FunctionReference: fission.FunctionReference{
@@ -109,7 +108,7 @@ func mqtUpdate(c *cli.Context) error {
 	if len(mqtName) == 0 {
 		fatal("Need name of trigger, use --name")
 	}
-	triggerNamespace := c.String("triggerNamespace")
+
 	topic := c.String("topic")
 	respTopic := c.String("resptopic")
 	fnName := c.String("function")
@@ -117,7 +116,7 @@ func mqtUpdate(c *cli.Context) error {
 
 	mqt, err := client.MessageQueueTriggerGet(&metav1.ObjectMeta{
 		Name:      mqtName,
-		Namespace: triggerNamespace,
+		Namespace: metav1.NamespaceDefault,
 	})
 	checkErr(err, "get Time trigger")
 
@@ -160,11 +159,10 @@ func mqtDelete(c *cli.Context) error {
 	if len(mqtName) == 0 {
 		fatal("Need name of trigger to delete, use --name")
 	}
-	triggerNamespace := c.String("triggerNamespace")
 
 	err := client.MessageQueueTriggerDelete(&metav1.ObjectMeta{
 		Name:      mqtName,
-		Namespace: triggerNamespace,
+		Namespace: metav1.NamespaceDefault,
 	})
 	checkErr(err, "delete trigger")
 
@@ -172,7 +170,6 @@ func mqtDelete(c *cli.Context) error {
 	return nil
 }
 
-// TODO : Fix this later with ns input
 func mqtList(c *cli.Context) error {
 	client := getClient(c.GlobalString("server"))
 

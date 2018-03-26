@@ -27,11 +27,11 @@ import (
 	"syscall"
 
 	"github.com/gorilla/handlers"
-	rbac "k8s.io/client-go/pkg/apis/rbac/v1beta1"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
+	rbac "k8s.io/client-go/pkg/apis/rbac/v1beta1"
 )
 
 func UrlForFunction(name string) string {
@@ -72,16 +72,16 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-
+// following set of utilities are for setting up cluster role bindings for fission env deployments.
 func makeClusterRoleBindingObj(ns, sa, clusterRoleBinding, clusterRole string) *rbac.ClusterRoleBinding {
-	return & rbac.ClusterRoleBinding{
+	return &rbac.ClusterRoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      clusterRoleBinding,
+			Name: clusterRoleBinding,
 		},
 		Subjects: []rbac.Subject{
 			{
-				Kind: "ServiceAccount",
-				Name: sa,
+				Kind:      "ServiceAccount",
+				Name:      sa,
 				Namespace: ns,
 			},
 		},
@@ -95,17 +95,17 @@ func makeClusterRoleBindingObj(ns, sa, clusterRoleBinding, clusterRole string) *
 func addSAToClusterRoleBinding(k8sClient *kubernetes.Clientset, crbObj *rbac.ClusterRoleBinding, sa, ns string) error {
 	subjects := crbObj.Subjects
 	subjects = append(subjects, rbac.Subject{
-				Kind: "ServiceAccount",
-				Name: sa,
-				Namespace: ns,
-			})
+		Kind:      "ServiceAccount",
+		Name:      sa,
+		Namespace: ns,
+	})
 	crbObj.Subjects = subjects
 
 	_, err := k8sClient.RbacV1beta1().ClusterRoleBindings().Update(crbObj)
 	return err
 }
 
-func isSAInClusterRoleBinding(crbObj*rbac.ClusterRoleBinding , sa, ns string) bool {
+func isSAInClusterRoleBinding(crbObj *rbac.ClusterRoleBinding, sa, ns string) bool {
 	for _, subject := range crbObj.Subjects {
 		if subject.Name == sa && subject.Namespace == ns {
 			return true
@@ -115,8 +115,8 @@ func isSAInClusterRoleBinding(crbObj*rbac.ClusterRoleBinding , sa, ns string) bo
 	return false
 }
 
-func setupClusterRoleBinding(k8sClient *kubernetes.Clientset, sa, ns, clusterRoleBinding, clusterRole string) (error) {
-	// get on the cluster role binding object
+func setupClusterRoleBinding(k8sClient *kubernetes.Clientset, sa, ns, clusterRoleBinding, clusterRole string) error {
+	// get the cluster role binding object
 	crbObj, err := k8sClient.RbacV1beta1().ClusterRoleBindings().Get(
 		clusterRoleBinding, metav1.GetOptions{})
 
@@ -160,7 +160,7 @@ func setupSA(k8sClient *kubernetes.Clientset, sa, ns string) (*apiv1.ServiceAcco
 	return saObj, err
 }
 
-func SetupRBAC(k8sClient *kubernetes.Clientset, sa, ns, clusterRoleBinding, clusterRole string) (error) {
+func SetupRBAC(k8sClient *kubernetes.Clientset, sa, ns, clusterRoleBinding, clusterRole string) error {
 	_, err := setupSA(k8sClient, sa, ns)
 	if err != nil {
 		return err
@@ -168,5 +168,3 @@ func SetupRBAC(k8sClient *kubernetes.Clientset, sa, ns, clusterRoleBinding, clus
 
 	return setupClusterRoleBinding(k8sClient, sa, ns, clusterRoleBinding, clusterRole)
 }
-
-

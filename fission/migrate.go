@@ -55,7 +55,7 @@ func migrateDumpTPRResource(client *client.Client, filename string) {
 	checkErr(err, "dump environments")
 	watches, err := client.WatchList()
 	checkErr(err, "dump watches")
-	timeTriggers, err := client.TimeTriggerList(metav1.NamespaceAll)
+	timeTriggers, err := client.TimeTriggerList()
 	checkErr(err, "dump time triggers")
 	mqTriggers, err := client.MessageQueueTriggerList(messageQueue.NATS)
 	checkErr(err, "dump message queue triggers")
