@@ -168,6 +168,7 @@ func fnCreate(c *cli.Context) error {
 		checkErr(err, fmt.Sprintf("read package '%v'", pkgName))
 		pkgMetadata = &pkg.Metadata
 		envName = pkg.Spec.Environment.Name
+		envNamespace = pkg.Spec.Environment.Namespace
 	} else {
 		// need to specify environment for creating new package
 		envName = c.String("env")
