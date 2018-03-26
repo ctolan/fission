@@ -95,8 +95,8 @@ func (deploy *NewDeploy) getDeployment(fn *crd.Function) (*v1beta1.Deployment, e
 	return deploy.kubernetesClient.ExtensionsV1beta1().Deployments(fn.Metadata.Namespace).Get(deployName, metav1.GetOptions{})
 }
 
-func (deploy *NewDeploy) updateDeployment(deployment *v1beta1.Deployment) error {
-	_, err := deploy.kubernetesClient.ExtensionsV1beta1().Deployments(deployment.ObjectMeta.Namespace).Update(deployment)
+func (deploy *NewDeploy) updateDeployment(deployment *v1beta1.Deployment, ns string) error {
+	_, err := deploy.kubernetesClient.ExtensionsV1beta1().Deployments(ns).Update(deployment)
 	return err
 }
 

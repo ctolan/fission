@@ -441,7 +441,6 @@ func (deploy *NewDeploy) fnUpdate(oldFn *crd.Function, newFn *crd.Function) {
 	if len(oldFn.Spec.Secrets) != len(newFn.Spec.Secrets) {
 		deployChanged = true
 	} else {
-		// TODO : Check with Vishal about the ordering of secrets.
 		for i, newSecret := range newFn.Spec.Secrets {
 			if newSecret != oldFn.Spec.Secrets[i] {
 				deployChanged = true
@@ -475,7 +474,7 @@ func (deploy *NewDeploy) fnUpdate(oldFn *crd.Function, newFn *crd.Function) {
 			updateStatus(oldFn, err, "failed to get new deployment spec while updating function")
 			return
 		}
-		err = deploy.updateDeployment(newDeployment)
+		err = deploy.updateDeployment(newDeployment, newFn.Metadata.Namespace)
 		if err != nil {
 			updateStatus(oldFn, err, "failed to update deployment while updating function")
 			return
