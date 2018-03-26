@@ -474,7 +474,15 @@ func (deploy *NewDeploy) fnUpdate(oldFn *crd.Function, newFn *crd.Function) {
 			updateStatus(oldFn, err, "failed to get new deployment spec while updating function")
 			return
 		}
-		err = deploy.updateDeployment(newDeployment, newFn.Metadata.Namespace)
+
+		// to support backward compatibility, if the function was created in default ns, we fall back to creating the
+		// deployment of the function in fission-function ns
+		ns := deploy.namespace
+		if newFn.Metadata.Namespace != metav1.NamespaceDefault {
+			ns = newFn.Metadata.Namespace
+		}
+
+		err = deploy.updateDeployment(newDeployment, ns)
 		if err != nil {
 			updateStatus(oldFn, err, "failed to update deployment while updating function")
 			return
