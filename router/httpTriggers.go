@@ -151,7 +151,7 @@ func (ts *HTTPTriggerSet) getRouter() *mux.Router {
 			function: &m,
 			executor: ts.executor,
 		}
-		muxRouter.HandleFunc(fission.UrlForFunction(function.Metadata.Name), fh.handler)
+		muxRouter.HandleFunc(fission.UrlForFunction(function.Metadata.Name, function.Metadata.Namespace), fh.handler)
 	}
 
 	// Healthz endpoint for the router.

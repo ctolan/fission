@@ -34,8 +34,11 @@ import (
 	rbac "k8s.io/client-go/pkg/apis/rbac/v1beta1"
 )
 
-func UrlForFunction(name string) string {
+func UrlForFunction(name, namespace string) string {
 	prefix := "/fission-function"
+	if namespace != metav1.NamespaceDefault {
+		prefix += "/" + namespace
+	}
 	return fmt.Sprintf("%v/%v", prefix, name)
 }
 

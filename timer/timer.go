@@ -143,7 +143,7 @@ func (timer *Timer) newCron(t crd.TimeTrigger) *cron.Cron {
 		headers := map[string]string{
 			"X-Fission-Timer-Name": t.Metadata.Name,
 		}
-		(*timer.publisher).Publish("", headers, fission.UrlForFunction(t.Spec.FunctionReference.Name))
+		(*timer.publisher).Publish("", headers, fission.UrlForFunction(t.Spec.FunctionReference.Name, t.Metadata.Namespace))
 	})
 	c.Start()
 	log.Printf("Add new cron for time trigger %v", t.Metadata.Name)

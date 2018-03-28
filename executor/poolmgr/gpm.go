@@ -86,6 +86,8 @@ func (gpm *GenericPoolManager) service() {
 		req := <-gpm.requestChannel
 		switch req.requestType {
 		case GET_POOL:
+			// TODO : If the executor is stopped and started again, although an env n its pool is present in k8s cluster,
+			// just because they are missing in the cache, we end up creating another duplicate pool.
 			var err error
 			pool, ok := gpm.pools[crd.CacheKey(&req.env.Metadata)]
 			if !ok {
