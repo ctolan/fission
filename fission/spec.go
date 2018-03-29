@@ -1132,7 +1132,7 @@ func applyHTTPTriggers(fclient *client.Client, fr *FissionResources, delete bool
 
 func applyKubernetesWatchTriggers(fclient *client.Client, fr *FissionResources, delete bool) (map[string]metav1.ObjectMeta, *resourceApplyStatus, error) {
 	// get list
-	allObjs, err := fclient.WatchList()
+	allObjs, err := fclient.WatchList(metav1.NamespaceAll)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -1215,7 +1215,7 @@ func applyKubernetesWatchTriggers(fclient *client.Client, fr *FissionResources, 
 
 func applyTimeTriggers(fclient *client.Client, fr *FissionResources, delete bool) (map[string]metav1.ObjectMeta, *resourceApplyStatus, error) {
 	// get list
-	allObjs, err := fclient.TimeTriggerList()
+	allObjs, err := fclient.TimeTriggerList(metav1.NamespaceAll)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -1298,7 +1298,7 @@ func applyTimeTriggers(fclient *client.Client, fr *FissionResources, delete bool
 
 func applyMessageQueueTriggers(fclient *client.Client, fr *FissionResources, delete bool) (map[string]metav1.ObjectMeta, *resourceApplyStatus, error) {
 	// get list
-	allObjs, err := fclient.MessageQueueTriggerList("")
+	allObjs, err := fclient.MessageQueueTriggerList("", metav1.NamespaceAll)
 	if err != nil {
 		return nil, nil, err
 	}

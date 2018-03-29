@@ -53,11 +53,11 @@ func migrateDumpTPRResource(client *client.Client, filename string) {
 	checkErr(err, "dump http triggers")
 	envs, err := client.EnvironmentList(metav1.NamespaceAll)
 	checkErr(err, "dump environments")
-	watches, err := client.WatchList()
+	watches, err := client.WatchList(metav1.NamespaceAll)
 	checkErr(err, "dump watches")
-	timeTriggers, err := client.TimeTriggerList()
+	timeTriggers, err := client.TimeTriggerList(metav1.NamespaceAll)
 	checkErr(err, "dump time triggers")
-	mqTriggers, err := client.MessageQueueTriggerList(messageQueue.NATS)
+	mqTriggers, err := client.MessageQueueTriggerList(messageQueue.NATS, metav1.NamespaceAll)
 	checkErr(err, "dump message queue triggers")
 
 	tprResource := TPRResource{

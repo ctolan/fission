@@ -35,7 +35,6 @@ create_env() {
 
 
 main() {
-
     # pool mgr tests
     # 1. env ns1, func ns2 with code, route and verify specialized pod in ns1, also verify pkg in ns2
 
@@ -60,6 +59,34 @@ main() {
 
     # 2. env default, func ns2 with code, route and verify specialized pod in fission-function
 
+
+    # internal route tests.
+    # 1. env ns1, func ns2 with code, curl http://FISSION_ROUTER/fission-function/ns2/func -> should work
+
+    # 2. env in default, func ns2 with code, curl http://FISSION_ROUTER/fission-function/func -> should work
+
+
+
+    # timer trigger tests.
+    # 1. env ns1, func ns2 with code, tt ( with a one time cron string for executing imm'ly), verify function is executed
+    # this also indirectly tests internal route established at http://FISSION_ROUTER/ns1/func
+
+    # 2. env in default, func ns2 with code, tt ( with a one time cron string for executing imm'ly), verify function is executed
+    # this also indirectly tests internal route established at http://FISSION_ROUTER/func
+
+
+
+    # kube watch tests.
+    # 1. env ns1, func ns2 with code, watch Trigger ( TBD), verify function is executed
+    # this also indirectly tests internal route established at http://FISSION_ROUTER/ns1/func
+
+    # 2. env in default, func ns2 with code, watch Trigger ( TBD ), verify function is executed
+    # this also indirectly tests internal route established at http://FISSION_ROUTER/func
+
+
+
+    # msq trigger tests.
+    # 1. integrate after mqtrigger is checked into master.
 
     log "WIP"
 
